@@ -19,14 +19,14 @@ final class YTDLPEngine: @unchecked Sendable {
     /// Starts Python and imports yt-dlp. Safe to call repeatedly; returns the yt-dlp version.
     @discardableResult
     func start() async throws -> String {
-        startLock.lock()
-        if startTask == nil {
-            startTask = Task.detached(priority: .userInitiated) {
+        let task = startLock.withLock {
+            if let startTask { return startTask }
+            let task = Task.detached(priority: .userInitiated) {
                 try await self.boot()
             }
+            startTask = task
+            return task
         }
-        let task = startTask!
-        startLock.unlock()
         return try await task.value
     }
 

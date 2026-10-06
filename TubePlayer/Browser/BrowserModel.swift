@@ -93,7 +93,13 @@ final class BrowserModel: NSObject {
 
     func back() { webView.goBack() }
     func forward() { webView.goForward() }
-    func reload() { isLoading ? webView.stopLoading() : webView.reload() }
+    func reload() {
+        if isLoading {
+            webView.stopLoading()
+        } else {
+            webView.reload()
+        }
+    }
 
     func playCurrentPage() {
         guard let url = currentURL else { return }
